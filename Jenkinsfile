@@ -22,9 +22,14 @@ pipeline {
         }
 
         stage('Run Tests') {
-            steps {
-               echo "Test are running"
+             steps {
+        script {
+            docker.image('my-node-app').inside {
+                sh 'npm install'
+                sh 'npm test'
             }
+        }
+    }
         }
 
         stage('Run Docker Container') {
