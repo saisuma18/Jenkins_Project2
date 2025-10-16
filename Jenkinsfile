@@ -4,6 +4,10 @@ pipeline {
     environment {
         IMAGE_NAME = 'my-node-app'
         DOCKER_HUB_USER = 'saisuma18@gmail.com' // Optional if pushing to Docker Hub
+	DOCKER_HUB_CREDENTIALS = 'saisuma18@gmail.com' // Jenkins credentials ID for Docker Hub login
+        AWS_REGION = 'ap-south-1'
+        EKS_CLUSTER = 'my-eks-cluster-name'
+
     }
 
     stages {
@@ -20,6 +24,15 @@ pipeline {
                 }
             }
         }
+	stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://hub.docker.com/repositories/saisuma18', "${DOCKER_HUB_CREDENTIALS}") {
+                        docker.image("${IMAGE_NAME}").push('latest')
+                    }
+                }
+            }
+        }
 
         stage('Run Tests') {
              steps {
@@ -30,11 +43,17 @@ pipeline {
             }
         }
     }
-        }
-
-        stage('Run Docker Container') {
+ }
+ stage('Deploy to EKS') {
             steps {
-                sh "docker run -d -p 3000:3000 ${IMAGE_NAME}"
+                script {
+                    // Configure kubectl to point to your EKS cluster
+                    sh """
+                    aws eks --region ${AWS_REGION} update-kubeconfig --name ${EKS_CLUSTER}
+                    kubectl apply -f k8s/deployment.yaml
+                    kubectl apply -f k8s/service.yaml
+                    """
+                }
             }
         }
     }
