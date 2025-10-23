@@ -27,8 +27,8 @@ pipeline {
 	stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('https://hub.docker.com/repositories/saisuma18', "${DOCKER_HUB_CREDENTIALS}") {
-                        docker.image("${IMAGE_NAME}").push('latest')
+            docker.withRegistry('https://index.docker.io/v1/', 'saisuma18') {
+                sh 'docker push my-node-app:latest'
                     }
                 }
             }
