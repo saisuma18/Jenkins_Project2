@@ -4,7 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = 'my-node-app'
         DOCKER_HUB_USER = 'saisuma18@gmail.com' // Optional if pushing to Docker Hub
-	    DOCKER_HUB_PASSWORD = credentials('Flower17@')
+	    DOCKER_HUB_PASSWORD = credentials
         KUBE_CONFIG = credentials('kubeconfig') // Jenkins secret text or file for kubectl access
 
     }
