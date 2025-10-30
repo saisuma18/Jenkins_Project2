@@ -3,10 +3,6 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'my-node-app'
-        DOCKER_HUB_USER = 'saisuma18@gmail.com' // Optional if pushing to Docker Hub
-	    DOCKER_HUB_PASSWORD = credentials('docker-hub-password')
-        KUBE_CONFIG = credentials('kubeconfig') // Jenkins secret text or file for kubectl access
-
     }
 
     stages {
@@ -19,31 +15,35 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage =docker.build("${IMAGE_NAME}")
+                    dockerImage = docker.build("${IMAGE_NAME}")
                 }
             }
         }
-	stage('Push Docker Image') {
+
+        stage('Push Docker Image') {
             steps {
                 script {
-            docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_HUB_USER}") {
-                dockerImage.push("latest")
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-password', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_USER}:${DOCKER_PASS}") {
+                            dockerImage.push("latest")
+                        }
                     }
                 }
             }
         }
 
         stage('Run Tests') {
-             steps {
-        script {
-            docker.image('my-node-app').inside {
-                sh 'npm install'
-                echo "Skipping tests"
+            steps {
+                script {
+                    docker.image('my-node-app').inside {
+                        sh 'npm install'
+                        echo "Skipping tests"
+                    }
+                }
             }
         }
-    }
- }
- stage('Deploy to Kubernetes') {
+
+        stage('Deploy to Kubernetes') {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]) {
                     sh '''
