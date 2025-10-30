@@ -1,7 +1,9 @@
-piVersion: apps/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-node-app-deployment
+  name: my-node-app
+  labels:
+    app: my-node-app
 spec:
   replicas: 2
   selector:
@@ -14,6 +16,16 @@ spec:
     spec:
       containers:
         - name: my-node-app
-          image: saisuma18/my-node-app:latest   # Use correct image (push to Docker Hub or registry)
+          image: saisuma18@gmail.com/my-node-app:latest
           ports:
             - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: "production"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
