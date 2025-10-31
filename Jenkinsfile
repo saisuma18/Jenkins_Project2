@@ -21,17 +21,18 @@ pipeline {
         }
 
         stage('Push Docker Image') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-password', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_USER}:${DOCKER_PASS}") {
-                            dockerImage.push("latest")
-                        }
-                    }
-                }
+    steps {
+        script {
+            withCredentials([usernamePassword(credentialsId: 'docker-hub-password', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
+                sh """
+                    echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
+                    docker tag my-node-app $DOCKERHUB_USER/my-node-app:latest
+                    docker push $DOCKERHUB_USER/my-node-app:latest
+                """
             }
         }
-
+    }
+}
         stage('Run Tests') {
             steps {
                 script {
