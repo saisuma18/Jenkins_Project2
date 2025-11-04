@@ -21,20 +21,20 @@ pipeline {
         }
 
         stage('Push Docker Image') {
-    steps {
-        script {
-            withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-    sh 'docker login -u $DOCKER_USER -p $DOCKER_PASS'
-    sh 'docker push my-node-app:latest'
-            }
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) 			{
+                        sh 'docker login -u $DOCKER_USER -p $DOCKER_PASS'
+                        sh "docker push ${IMAGE_NAME}:latest"
+                    }
+                }
             }
         }
-        }
-    
+
         stage('Run Tests') {
             steps {
                 script {
-                    docker.image('my-node-app').inside {
+                    docker.image("${IMAGE_NAME}").inside {
                         sh 'npm install'
                         echo "Skipping tests"
                     }
@@ -54,3 +54,4 @@ pipeline {
             }
         }
     }
+}
