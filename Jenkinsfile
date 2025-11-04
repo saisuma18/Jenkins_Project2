@@ -23,12 +23,10 @@ pipeline {
         stage('Push Docker Image') {
     steps {
         script {
-            withCredentials([usernamePassword(credentialsId: 'docker-hub-password', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
-                sh """
-                    echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
-                    docker tag my-node-app $DOCKERHUB_USER/my-node-app:latest
-                    docker push $DOCKERHUB_USER/my-node-app:latest
-                """
+            withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+    sh 'docker login -u $DOCKER_USER -p $DOCKER_PASS'
+    sh 'docker push my-node-app:latest'
+            }
             }
         }
     }
