@@ -3,7 +3,8 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'my-node-app'
-        DOCKER_HUB_USER='saisuma18@gmail.com'
+        DOCKER_HUB_USER='saisuma18
+        DOCKER_IMAGE = "${DOCKER_HUB_USER}/my-node-app:latest"
     }
 
     stages {
@@ -26,9 +27,8 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
             sh '''
                 echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                docker tag my-node-app:latest $DOCKER_USER/my-node-app:latest
-                docker push $DOCKER_USER/my-node-app:latest
-            '''
+                docker push $DOCKER_IMAGE
+                    '''
         }
     }
 }
