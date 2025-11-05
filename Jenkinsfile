@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'my-node-app'
+        DOCKER_HUB_USER='saisuma18@gmail.com'
     }
 
     stages {
@@ -55,3 +56,4 @@ pipeline {
         }
     }
 }
+
