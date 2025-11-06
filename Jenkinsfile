@@ -51,6 +51,7 @@ pipeline {
                         export KUBECONFIG=$KUBECONFIG_FILE
                         kubectl apply -f deployment.yaml
                         kubectl apply -f service.yaml
+                         kubectl rollout status deployment/my-node-app
                     '''
                 }
             }
